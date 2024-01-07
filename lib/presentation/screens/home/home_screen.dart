@@ -1,56 +1,91 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spotify/presentation/providers/albums_provider.dart';
+import 'package:spotify/presentation/widgets/widgets.dart';
 
 
-class HomeScreen extends ConsumerStatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
-  HomeScreenState createState() => HomeScreenState();
+  Widget build(BuildContext context) {
+    return  const Scaffold(
+      body: Column(
+        children: [
+
+          _TitleBar(),
+
+          _HomeView(),
+
+          SizedBox(height: 5,)
+        ],
+      ),
+    );
+  }
 }
 
-class HomeScreenState extends ConsumerState<HomeScreen> {
+class _HomeView extends ConsumerStatefulWidget {
+  const _HomeView();
 
+  @override
+  _HomeViewState createState() => _HomeViewState();
+}
+
+class _HomeViewState extends ConsumerState<_HomeView> {
   final controller = ScrollController();
 
   @override
   void initState() {
     super.initState();
     ref.read(albumsProvider.notifier).loadNextAlbums();
-    
     controller.addListener(() { 
       final position = controller.position.pixels;
-      final page = controller.position.maxScrollExtent;
+      final maxPos = controller.position.maxScrollExtent;
 
-      if (position >= page) {
-        print('Cargando nueva data');
+      if (position == maxPos) {
         ref.read(albumsProvider.notifier).loadNextAlbums();
       }
+
     });
   }
+
+  
 
   @override
   Widget build(BuildContext context) {
     final albums = ref.watch(albumsProvider);
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Spotify app'),
+    return albums.isNotEmpty ? Expanded(
+      child: GridView.builder(
+        controller: controller,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 8.0, // Espacio horizontal entre elementos
+          mainAxisSpacing: 8.0, // Espacio vertical entre elementos
+        ),
+        itemCount: albums.length,
+        itemBuilder: (BuildContext context, int index) {
+          final album = albums[index];
+          return AlbumCard(album: album);
+        },
       ),
-      body: albums.isNotEmpty 
-        ? ListView.builder(
-          controller: controller,
-          itemCount: albums.length,
-          itemBuilder: (context, index) {
-            final album = albums[index];
-            return ListTile(
-              title: Text(album.name),
-              subtitle: Text('index: $index'),
-              
-            );
-          },
-        )
-        : const  Center(child: CircularProgressIndicator())
+    ): const Center(child: CircularProgressIndicator());
+  }
+}
+
+class _TitleBar extends StatelessWidget {
+  const _TitleBar();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.only(top: 50),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CustomLogo(size: 50),
+          Text('Spotify App',style: TextStyle(fontSize: 30),)
+        ],
+      ),
     );
   }
 }
