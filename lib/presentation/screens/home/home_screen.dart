@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:spotify/presentation/providers/albums_provider.dart';
 import 'package:spotify/presentation/widgets/widgets.dart';
 
@@ -65,7 +66,12 @@ class _HomeViewState extends ConsumerState<_HomeView> {
         itemCount: albums.length,
         itemBuilder: (BuildContext context, int index) {
           final album = albums[index];
-          return AlbumCard(album: album);
+          return GestureDetector(
+            child: AlbumCard(album: album),
+            onTap: () {
+              context.push('/single/${album.artist[0].id}');
+            },
+          );
         },
       ),
     ): const Center(child: CircularProgressIndicator());
