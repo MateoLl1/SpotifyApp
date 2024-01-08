@@ -2,17 +2,21 @@ import 'package:dio/dio.dart';
 import 'package:spotify/config/config.dart';
 import 'package:spotify/domain/domain.dart';
 import 'package:spotify/infrastructure/infrastructure.dart';
+import 'package:spotify/infrastructure/mappers/artist_mapper.dart';
 
 final apiKey = Environment.apiToken;
 class SpotifyDatasource extends MusicDatasource {
   final dio = Dio(BaseOptions(
       baseUrl: 'https://api.spotify.com/v1',
-      headers: {'Authorization': 'Bearer $apiKey'}
+      headers: {'Authorization': 'Bearer $apiKey'},
     )
   );
   @override
-  Future<Artist> getArtist(int id) {
-    throw UnimplementedError();
+  Future<Artist> getArtist(String id)async {
+    final response = await dio.get('/artists/$id');
+    final artistResponse = GetArtistResponse.fromJson(response.data);
+    final newArtist = ArtistMapper.toEntityArtist(artistResponse);
+    return newArtist;
   }
 
   @override

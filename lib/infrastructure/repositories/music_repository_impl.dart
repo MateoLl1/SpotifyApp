@@ -9,7 +9,7 @@ class MusicRepositoryImpl extends MusicRepository {
   MusicRepositoryImpl({required this.datasource});
 
   @override
-  Future<Artist> getArtist(int id) {
+  Future<Artist> getArtist(String id) {
     return datasource.getArtist(id);
   }
 

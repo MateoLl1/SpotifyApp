@@ -7,6 +7,6 @@ abstract class MusicDatasource {
   Future<List<Album>> getNewReleases({int limit = 10 , int offset = 0});
   
   // TODO CARGAR ARTISTA
-  Future<Artist> getArtist( int  id );
+  Future<Artist> getArtist( String  id );
 
 }
